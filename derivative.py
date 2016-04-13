@@ -1,6 +1,8 @@
 # Writes a function that takes a parse tree for a mathematical expression
 # and calculates the derivative of the expression with respect to some variable.
 
+import operator
+
 class Stack:
      def __init__(self):
          self.items = []
@@ -87,26 +89,34 @@ class BinaryTree:
     		left = self.leftChild
     		right = self.rightChild
 
-    		if right.root == '0':
+    		if is_number(right.root) and is_number(left.root):
+    			ops = { "+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.div }
+    			result = ops[op](float(left.root),float(right.root))
+    			self.replaceTree(BinaryTree(str(result)))
+
+    		elif right.root in '0.0':
     			if op in '+-':
     				self.replaceTree(left)
     			elif op == '*':
     				self.replaceTree(BinaryTree('0'))
     			elif op == '/':
-    				raise ValueError('Division by zero')
+    				raise ZeroDivisionError('Division by zero')
     			else:
     				raise TypeError('Wrong operation')
 
-    		elif left.root == '0':
+    		elif left.root in '0.0':
 				if op == '+':
+					self.replaceTree(right)
+				if op == '-':
+					right.root = '-'+right.root
 					self.replaceTree(right)
 				elif op in '*/':
 					self.replaceTree(BinaryTree('0'))
 
-    		elif right.root == '1' and op == '*':
+    		elif right.root in '1.0' and op == '*':
 				self.replaceTree(left)
 
-    		elif left.root == '1' and op == '*':
+    		elif left.root in '1.0' and op == '*':
 				self.replaceTree(right)    		
 
 		
@@ -219,7 +229,7 @@ def derivative(tree,variable):
 				derTree.insertRight(denominator)
 
 		 	else:
-		 		raise ValueError("Division by zero")
+		 		raise ZeroDivisionError("Division by zero")
 
 	elif currVal == variable:
 		derTree = BinaryTree('1')
@@ -230,34 +240,104 @@ def derivative(tree,variable):
 	derTree.simplifyTree()
 	return derTree
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False	
+
 
 # Tests
+
+print("Simplification tests")
+
+fun = '( x + 0 )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( x - 0 )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( x * 0 )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( x / 0 )'
+try:
+	tree = buildParseTree(fun)
+except ZeroDivisionError:
+	print("The function: %s throws a ZeroDivisionError message" % fun)
+
+fun = '( 0 + x )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( 0 - x )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( 0 * x )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( 0 / x )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( 1 + 2 )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( 3 / 2 )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( 3 / 0 )'
+try:
+	tree = buildParseTree(fun)
+except ZeroDivisionError:
+	print("The function: %s throws a ZeroDivisionError message" % fun)
+
+fun = '( ( x + y ) * ( 3 - 3 ) )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+fun = '( ( x + y ) * ( z + ( w * 1 ) ) )'
+tree = buildParseTree(fun)
+print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+
+print("\nDerivation tests")
+
 fun = '( 2 * x )'
 var = 'x'
 tree = buildParseTree(fun)
 der = derivative(tree, var)
-print("The derivative of:\n\t%s\nwith respect to %s is:\n\t%s\n" % (fun, var, printexp(der)))
+print("The derivative of:%s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
 fun = "( ( x + y ) * x )"
 var = 'x'
 tree = buildParseTree(fun)
 der = derivative(tree, var)
-print("The derivative of:\n\t%s\nwith respect to %s is:\n\t%s\n" % (fun, var, printexp(der)))
+print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
 fun = "( ( x + y ) * x )"
 var = 'y'
 tree = buildParseTree(fun)
 der = derivative(tree, var)
-print("The derivative of:\n\t%s\nwith respect to %s is:\n\t%s\n" % (fun, var, printexp(der)))
+print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
 fun = "( ( x + y ) / x )"
 var = 'x'
 tree = buildParseTree(fun)
 der = derivative(tree, var)
-print("The derivative of:\n\t%s\nwith respect to %s is:\n\t%s\n" % (fun, var, printexp(der)))
+print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
-fun = "( 2 + 2 )"
+fun = "( ( 2 * x ) + ( 3 + x ) )"
+var = 'x'
 tree = buildParseTree(fun)
-print(printexp(tree))
-
+der = derivative(tree,var)
+print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
