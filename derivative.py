@@ -23,7 +23,7 @@ class Stack:
          return len(self.items)
 
 
-class BinaryTree:
+class ArithmeticTree:
     def __init__(self,rootObj):
         self.root = rootObj
         self.leftChild = None
@@ -33,7 +33,7 @@ class BinaryTree:
     # it creates a tree and puts it in the root      
     def insertLeft(self,newNode):
     	if isinstance(newNode, basestring):
-    		newNode = BinaryTree(newNode)
+    		newNode = ArithmeticTree(newNode)
 
         if self.leftChild == None:
             self.leftChild = newNode
@@ -45,7 +45,7 @@ class BinaryTree:
     # it creates a tree and puts it in the root      
     def insertRight(self,newNode):
     	if isinstance(newNode, basestring):
-    		newNode = BinaryTree(newNode)
+    		newNode = ArithmeticTree(newNode)
 
         if self.rightChild == None:
             self.rightChild = newNode
@@ -92,13 +92,13 @@ class BinaryTree:
     		if is_number(right.root) and is_number(left.root):
     			ops = { "+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.div }
     			result = ops[op](float(left.root),float(right.root))
-    			self.replaceTree(BinaryTree(str(result)))
+    			self.replaceTree(ArithmeticTree(str(result)))
 
     		elif right.root in '0.0':
     			if op in '+-':
     				self.replaceTree(left)
     			elif op == '*':
-    				self.replaceTree(BinaryTree('0'))
+    				self.replaceTree(ArithmeticTree('0'))
     			elif op == '/':
     				raise ZeroDivisionError('Division by zero')
     			else:
@@ -111,7 +111,7 @@ class BinaryTree:
 					right.root = '-'+right.root
 					self.replaceTree(right)
 				elif op in '*/':
-					self.replaceTree(BinaryTree('0'))
+					self.replaceTree(ArithmeticTree('0'))
 
     		elif right.root in '1.0' and op == '*':
 				self.replaceTree(left)
@@ -139,7 +139,7 @@ def printexp(tree):
 def buildParseTree(fpexp):
     fplist = fpexp.split()
     pStack = Stack()
-    eTree = BinaryTree('')
+    eTree = ArithmeticTree('')
     pStack.push(eTree)
     currentTree = eTree
     for i in fplist:
@@ -173,8 +173,8 @@ def buildParseTree(fpexp):
 
 def derivative(tree,variable):
 
-	if not isinstance(tree,BinaryTree):
-	 	raise TypeError('Derivative takes as first argument an object of the BinaryTree class')
+	if not isinstance(tree,ArithmeticTree):
+	 	raise TypeError('Derivative takes as first argument an object of the ArithmeticTree class')
 
 	if type(variable) is not str:
 	 	raise TypeError('Derivative takes as second argument a string')
@@ -188,18 +188,18 @@ def derivative(tree,variable):
 		rightDer = derivative(rightChild, variable)
 
 		if currVal == '+' or currVal == '-':
-			derTree = BinaryTree(currVal)
+			derTree = ArithmeticTree(currVal)
 			derTree.insertLeft(leftDer)
 			derTree.insertRight(rightDer)
 
 		elif currVal == '*':
-			derTree = BinaryTree('+')
+			derTree = ArithmeticTree('+')
 
-			firstTerm = BinaryTree('*')
+			firstTerm = ArithmeticTree('*')
 			firstTerm.insertLeft(leftDer)
 			firstTerm.insertRight(rightChild)
 
-			secondTerm = BinaryTree('*')
+			secondTerm = ArithmeticTree('*')
 			secondTerm.insertLeft(leftChild)
 			secondTerm.insertRight(rightDer)
 
@@ -209,19 +209,19 @@ def derivative(tree,variable):
 
 		elif currVal == '/':
 			if rightChild.root != '0':
-				derTree = BinaryTree('/')
+				derTree = ArithmeticTree('/')
 
-				numerator = BinaryTree('-')
-				numFirstTerm = BinaryTree('*')
+				numerator = ArithmeticTree('-')
+				numFirstTerm = ArithmeticTree('*')
 				numFirstTerm.insertLeft(leftDer)
 				numFirstTerm.insertRight(rightChild)
-				numSecTerm = BinaryTree('*')				
+				numSecTerm = ArithmeticTree('*')				
 				numSecTerm.insertLeft(leftChild)
 				numSecTerm.insertRight(rightDer)
 				numerator.insertLeft(numFirstTerm)
 				numerator.insertRight(numSecTerm)
 								
-				denominator = BinaryTree('*')
+				denominator = ArithmeticTree('*')
 				denominator.insertLeft(rightChild)
 				denominator.insertRight(rightChild)
 
@@ -232,10 +232,10 @@ def derivative(tree,variable):
 		 		raise ZeroDivisionError("Division by zero")
 
 	elif currVal == variable:
-		derTree = BinaryTree('1')
+		derTree = ArithmeticTree('1')
 
 	else: 
-		derTree = BinaryTree('0')
+		derTree = ArithmeticTree('0')
 
 	derTree.simplifyTree()
 	return derTree
