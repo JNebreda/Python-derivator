@@ -1,6 +1,4 @@
-# Writes a function that takes a parse tree for a mathematical expression
-# and calculates the derivative of the expression with respect to some variable.
-
+""" Parse and simplify an arithmetic expression and calculate its derivative."""
 import operator
 
 class Stack:
@@ -23,14 +21,16 @@ class Stack:
          return len(self.items)
 
 
-class ArithmeticTree:
+class ArithmeticTree:	
+    """Create a binary tree containing an arithmetic expression."""
+
     def __init__(self,rootObj):
         self.root = rootObj
         self.leftChild = None
         self.rightChild = None
 
-    # Inserts a tree as the left node. If given a string, 
-    # it creates a tree and puts it in the root      
+    # Insert a tree as the left node. If given a string, 
+    # create a tree and puts it in the root      
     def insertLeft(self,newNode):
     	if isinstance(newNode, basestring):
     		newNode = ArithmeticTree(newNode)
@@ -41,8 +41,8 @@ class ArithmeticTree:
             newNode.leftChild = self.leftChild
             self.leftChild = newNode
 
-    # Inserts a tree as the left node. If given a string, 
-    # it creates a tree and puts it in the root      
+    # Insert a tree as the left node. If given a string, 
+    # it create a tree and puts it in the root      
     def insertRight(self,newNode):
     	if isinstance(newNode, basestring):
     		newNode = ArithmeticTree(newNode)
@@ -61,7 +61,7 @@ class ArithmeticTree:
     def isLeafNode(self):
     	return not self.leftChild and not self.rightChild        
 
-	# Simplifies the full tree
+	# Simplify the full tree
     def simplifyTree(self):
     	root = self.root
     	left = self.leftChild
@@ -81,9 +81,8 @@ class ArithmeticTree:
     	self.simplifyOperation()
 
 
-    # Simplifies the operation in the root of the tree
+    # Simplify the operation in the root of the tree
     def simplifyOperation(self):
-
     	if not self.isLeafNode():
     		op = self.root
     		left = self.leftChild
@@ -122,6 +121,8 @@ class ArithmeticTree:
 		
 
 def printexp(tree):
+	"""Return the string representation of an ArithmeticTree."""
+
 	if not tree:
 		return None
 	else:
@@ -137,6 +138,8 @@ def printexp(tree):
 	  	return sVal    
 
 def buildParseTree(fpexp):
+    """Create an ArithmeticTree from a string."""
+
     fplist = fpexp.split()
     pStack = Stack()
     eTree = ArithmeticTree('')
@@ -172,6 +175,7 @@ def buildParseTree(fpexp):
     return eTree
 
 def derivative(tree,variable):
+	"""Derivate an arithmetic expression stored in an ArithmeticTree."""
 
 	if not isinstance(tree,ArithmeticTree):
 	 	raise TypeError('Derivative takes as first argument an object of the ArithmeticTree class')
@@ -248,96 +252,96 @@ def is_number(s):
         return False	
 
 
-# Tests
+if __name__ == "__main__":
+	# Tests
+	print("Simplification tests")
 
-print("Simplification tests")
-
-fun = '( x + 0 )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( x - 0 )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( x * 0 )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( x / 0 )'
-try:
+	fun = '( x + 0 )'
 	tree = buildParseTree(fun)
-except ZeroDivisionError:
-	print("The function: %s throws a ZeroDivisionError message" % fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
 
-fun = '( 0 + x )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( 0 - x )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( 0 * x )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( 0 / x )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( 1 + 2 )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( 3 / 2 )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
-
-fun = '( 3 / 0 )'
-try:
+	fun = '( x - 0 )'
 	tree = buildParseTree(fun)
-except ZeroDivisionError:
-	print("The function: %s throws a ZeroDivisionError message" % fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
 
-fun = '( ( x + y ) * ( 3 - 3 ) )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+	fun = '( x * 0 )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
 
-fun = '( ( x + y ) * ( z + ( w * 1 ) ) )'
-tree = buildParseTree(fun)
-print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+	fun = '( x / 0 )'
+	try:
+		tree = buildParseTree(fun)
+	except ZeroDivisionError:
+		print("The function: %s throws a ZeroDivisionError message" % fun)
+
+	fun = '( 0 + x )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+	
+	fun = '( 0 - x )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+	fun = '( 0 * x )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+	fun = '( 0 / x )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+	fun = '( 1 + 2 )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+	fun = '( 3 / 2 )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+	fun = '( 3 / 0 )'
+	try:
+		tree = buildParseTree(fun)
+	except ZeroDivisionError:
+		print("The function: %s throws a ZeroDivisionError message" % fun)
+
+	fun = '( ( x + y ) * ( 3 - 3 ) )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
+
+	fun = '( ( x + y ) * ( z + ( w * 1 ) ) )'
+	tree = buildParseTree(fun)
+	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
 
 
-print("\nDerivation tests")
+	print("\nDerivation tests")
 
-fun = '( 2 * x )'
-var = 'x'
-tree = buildParseTree(fun)
-der = derivative(tree, var)
-print("The derivative of:%s with respect to %s is: %s\n" % (fun, var, printexp(der)))
+	fun = '( 2 * x )'
+	var = 'x'
+	tree = buildParseTree(fun)
+	der = derivative(tree, var)
+	print("The derivative of:%s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
-fun = "( ( x + y ) * x )"
-var = 'x'
-tree = buildParseTree(fun)
-der = derivative(tree, var)
-print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
+	fun = "( ( x + y ) * x )"
+	var = 'x'
+	tree = buildParseTree(fun)
+	der = derivative(tree, var)
+	print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
-fun = "( ( x + y ) * x )"
-var = 'y'
-tree = buildParseTree(fun)
-der = derivative(tree, var)
-print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
+	fun = "( ( x + y ) * x )"
+	var = 'y'
+	tree = buildParseTree(fun)
+	der = derivative(tree, var)
+	print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
-fun = "( ( x + y ) / x )"
-var = 'x'
-tree = buildParseTree(fun)
-der = derivative(tree, var)
-print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
+	fun = "( ( x + y ) / x )"
+	var = 'x'
+	tree = buildParseTree(fun)
+	der = derivative(tree, var)
+	print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
-fun = "( ( 2 * x ) + ( 3 + x ) )"
-var = 'x'
-tree = buildParseTree(fun)
-der = derivative(tree,var)
-print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
+	fun = "( ( 2 * x ) + ( 3 + x ) )"
+	var = 'x'
+	tree = buildParseTree(fun)
+	der = derivative(tree,var)
+	print("The derivative of: %s with respect to %s is: %s\n" % (fun, var, printexp(der)))
 
