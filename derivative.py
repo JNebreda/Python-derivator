@@ -91,9 +91,9 @@ class ArithmeticTree:
     		if is_number(right.root) and is_number(left.root):
     			ops = { "+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.div }
     			result = ops[op](float(left.root),float(right.root))
-    			self.replaceTree(ArithmeticTree(str(result)))
+    			self.replaceTree(ArithmeticTree(result))
 
-    		elif right.root in '0.0':
+    		elif str(right.root) in '0.0':
     			if op in '+-':
     				self.replaceTree(left)
     			elif op == '*':
@@ -103,7 +103,7 @@ class ArithmeticTree:
     			else:
     				raise TypeError('Wrong operation')
 
-    		elif left.root in '0.0':
+    		elif str(left.root) in '0.0':
 				if op == '+':
 					self.replaceTree(right)
 				if op == '-':
@@ -112,10 +112,10 @@ class ArithmeticTree:
 				elif op in '*/':
 					self.replaceTree(ArithmeticTree('0'))
 
-    		elif right.root in '1.0' and op == '*':
+    		elif str(right.root) in '1.0' and op == '*':
 				self.replaceTree(left)
 
-    		elif left.root in '1.0' and op == '*':
+    		elif str(left.root) in '1.0' and op == '*':
 				self.replaceTree(right)    		
 
 		
@@ -133,7 +133,10 @@ def printexp(tree):
   		if leftChild and rightChild:
 	   		sVal = '( %s %s %s )' % (printexp(leftChild), currVal, printexp(rightChild))
 	   	else:
-	   		sVal = currVal
+                     if isinstance(currVal, float):
+                          sVal = "%.1f" % currVal
+                     else:
+                          sVal = str(currVal)
   
 	  	return sVal    
 
@@ -294,7 +297,7 @@ if __name__ == "__main__":
 	tree = buildParseTree(fun)
 	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
 
-	fun = '( 3 / 2 )'
+	fun = '( 2 / 3 )'
 	tree = buildParseTree(fun)
 	print("The function: %s gets simplified to: %s" % (fun, printexp(tree)))
 
